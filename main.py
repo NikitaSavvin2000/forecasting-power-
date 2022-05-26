@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 
-path_to_files = 'C:\\Users\\nsavvin\\Desktop\\programm'
+path_to_files = 'C:\\Users\\nsavvin\\Desktop\\programm2'
 
 
 try:
