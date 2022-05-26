@@ -56,7 +56,7 @@ def data_poisson(D, medium_values, count_values):
         #print(P_poission)
     return Q
 
-def min_and_max_poisson(Q):
+def min_and_max_poisson(Q, Data):
     Data_min = []
     Data_max = []
     R = list(map(list, zip(*Q))) # транспонирование списка списков
@@ -65,6 +65,14 @@ def min_and_max_poisson(Q):
         P_max = max(R[i])
         Data_min.append(P_min)
         Data_max.append(P_max)
+    r = {
+        'Time' : [time for time in Data['Time']],
+        'P_min_poisson_kW' : [min for min in Data_min],
+        'P_max_poisson_kW' : [max for max in Data_max]
+    }
+    result = pd.DataFrame(data = r)
+    result.to_excel(r'C:\\Users\\nsavvin\Desktop\\programm2\\Intermediate_data\\max_min_poisson.xlsx')
+    
     return Data_min, Data_max
         
 
