@@ -1,3 +1,4 @@
+import random
 import pandas as pd
 import numpy as np
 import math
@@ -43,18 +44,29 @@ def processed_data (d, t_step_min):
     Data = pd.read_excel(r'C:\\Users\\nsavvin\\Desktop\\programm\\Result.xlsx' )
     return Data
 
-def data_poisson(D, medium_values, count_values):
-    Q = []
-    s = np.random.poisson(medium_values, count_values)
-    #path_result_poisson = 'C:\\Users\\nsavvin\\Desktop\\programm\\result_poisson\\result_poisson.xlsx'
-    for i in range(len(s)):
-        P = np.array(D['P'])
-        P_poission = [(P[w]*s[i])/1000 for w in range(len(P))]
-        Q.append(P_poission)
-        #Data_poisson = pd.DataFrame(P_poission)
-        #Data_poisson.to_excel(path_result_poisson)
-        #print(P_poission)
+def data_poisson(D, medium_values, count_values, N):
+    for i in range(N):
+        Q = []
+        s = np.random.poisson(medium_values, count_values)
+        for i in range(len(s)):
+            P = np.array(D['P'])
+            P_poission = [(P[w]*s[i])/1000 for w in range(len(P))]
+            Q.append(P_poission)
     return Q
+
+def data_poisson(D, medium_values, count_values, N):
+        Q = []
+        interval = []
+        for k in range(len(D['Time'])):
+            for i in range(N):
+                poisson = np.random.poisson(medium_values, N)
+                tow = random(0,1) #доработать это список чисел длинной N сумма сгенерированных чисел должна равнятся 1 и шаг значений до стотых к примеру 0.01 + 0.07 + 0.02 = 1
+                interval_tow = k*100*tow[i]
+                interval.append(interval_tow)
+                
+                
+                
+
 
 def min_and_max_poisson(Q, Data):
     Data_min = []
@@ -67,16 +79,12 @@ def min_and_max_poisson(Q, Data):
         Data_max.append(P_max)
     r = {
         'Time' : [time for time in Data['Time']],
+        'Min count consumer' : [(Data_min[i]/Data['P'][i])*1000 for i in range(len(Data['P']))],
         'P_min_poisson_kW' : [min for min in Data_min],
+        'Max count consumer' : [(Data_max[i]/Data['P'][i])*1000 for i in range(len(Data['P']))],
         'P_max_poisson_kW' : [max for max in Data_max]
     }
     result = pd.DataFrame(data = r)
     result.to_excel(r'C:\\Users\\nsavvin\Desktop\\programm2\\Intermediate_data\\max_min_poisson.xlsx')
     
     return Data_min, Data_max
-        
-
-            
-            
-
-        
