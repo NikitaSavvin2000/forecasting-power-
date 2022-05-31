@@ -1,9 +1,14 @@
+import random
+import pandas as pd
+import numpy as np
+import math
+from parse import parse_hour_in_min, parse_min_in_hour
 import math
 import random
-
 import numpy as np
+result_x = []
 
-def random_list(N, start, end, medium_values, P_medium):
+def random_list_interval(N, start, end, medium_values, P_medium):
     x = random.sample(range(start, end), N)
     x.sort()
     poisson = np.random.poisson(medium_values, N+1)
@@ -20,8 +25,14 @@ def random_list(N, start, end, medium_values, P_medium):
         format_time.append(sec)
         time.append(format_time)
         P_poisson = [poisson[k]*P_medium for k in range(len(poisson))]
-    
-    print(x)
-    print(P_poisson)
+    return x, time, P_poisson
 
-random_list(20, 100, 200, 10, 1000)
+for i in range(3):
+    start = i * 100
+    end = (i+1) * 100
+    N = 4
+    medium_values = 10
+    P_medium =1000
+    x, time, P_poisson = random_list_interval(N, start, end, medium_values, P_medium)
+    result_x.append(time)
+print(result_x)
