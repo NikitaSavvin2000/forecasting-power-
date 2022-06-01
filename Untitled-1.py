@@ -1,60 +1,77 @@
-#!usr/bin/env python
-#_*_ coding:utf-8 _*_
- 
-"""
- title: python реализует алгоритм совместной фильтрации на основе пользователя и содержимого
-"""
-import numpy as np
-import pandas as pd
-from sklearn.metrics.pairwise import pairwise_distances
-from sklearn import model_selection as cv
-from sklearn.metrics import mean_squared_error
-from math import sqrt
- 
-#Файл # u.data содержит полный набор данных.
-#u_data_path="C:\\Users\\lenovo\\Desktop\\ml-100k\\"
-header = ['user_id', 'item_id']
-df = pd.read_csv(r'C:\\Users\\nsavvin\Downloads\\123.csv', sep=';')
-print(df.head(5))
-print(len(df))
-# Обратите внимание на первые две строки данных. Далее посчитаем общее количество пользователей и фильмов.
-n_users = df.user_id.unique().shape[0]  #unique () - дедупликация. Количество строк в shape [0]
-n_items = df.item_id.unique().shape[0]
-print ('Number of users = ' + str(n_users) + ' | Number of movies = ' + str(n_items))
-train_data, test_data = cv.train_test_split(df, test_size=0.25)
- 
-#Create two user-item matrices, one for training and another for testing
-# Разница между train_data и test_data
-train_data_matrix = np.zeros((n_users, n_items))
-print(train_data_matrix.shape)
-for line in train_data.itertuples():
-    train_data_matrix[int(line[0])-1, int(line[1])-1] = int(line[0])
-test_data_matrix = np.zeros((n_users, n_items))
-for line in test_data.itertuples():
-    test_data_matrix[line[0]-1, line[1]-1] = line[0]
-# Вы можете использовать функцию pairwise_distances программы sklearn для вычисления косинусного сходства. Обратите внимание: поскольку все оценки положительные, выходное значение должно быть от 0 до 1.
-user_similarity = pairwise_distances(train_data_matrix, metric='cosine')
-# Матрица транспонирования для достижения схожести темы
-item_similarity = pairwise_distances(train_data_matrix.T, metric='cosine')
- 
-def predict(ratings, similarity, type='user'):
-    if type == 'user':
-        mean_user_rating = ratings.mean(axis=1)
-        #You use np.newaxis so that mean_user_rating has same format as ratings
-        ratings_diff = (ratings - mean_user_rating[:, np.newaxis])
-        pred = mean_user_rating[:, np.newaxis] + similarity.dot(ratings_diff) / np.array([np.abs(similarity).sum(axis=1)]).T
-    elif type == 'item':
-        pred = ratings.dot(similarity) / np.array([np.abs(similarity).sum(axis=1)])
-    return pred
-item_prediction = predict(train_data_matrix, item_similarity, type='item')
-user_prediction = predict(train_data_matrix, user_similarity, type='user')
- 
-# Существует много индикаторов оценки, но одним из самых популярных индикаторов для оценки точности прогнозов является среднеквадратичная ошибка (RMSE).
+def graf_gistogram_poison(D, data_poisson, time_index_interval, t_step_min):
+    df1 = D
+    x1=time_index_interval
+    # находит среднее значение P в заданном промежутке в зависимости от количества файлов
+    Time_0 = np.array(df1['Time'], dtype=str)
+    step = int(60/t_step_min)
+    Time_01 = [Time_0[i] for i in range(0 ,len(Time_0), step)]
 
-def rmse(prediction, ground_truth):
-    prediction = prediction[ground_truth.nonzero()].flatten()#nonzero (a) возвращает индекс элемента, значение которого не равно нулю в массиве a, что эквивалентно извлечению разреженной матрицы
-    ground_truth = ground_truth[ground_truth.nonzero()].flatten()
-    return sqrt(mean_squared_error(prediction, ground_truth))
- 
-print ('User-based CF RMSE: ' + str(rmse(user_prediction, test_data_matrix)))
-print ('Item-based CF RMSE: ' + str(rmse(item_prediction, test_data_matrix)))
+    # размер графика
+    fig = plt.figure(figsize=(20,15))
+    ax = fig.add_subplot()
+
+    # сам график
+    for i in range(len(data_poisson)):
+        y1 = data_poisson[i]
+        ax.step(x1, y1, color = 'r', linewidth = 1)
+    
+    ax.set_xlabel('Время', size = 24)
+    ax.set_ylabel('Мощность при различном одновременном включении (распределение Пуассона) кВт', size = 8)
+    ax.tick_params(labelsize = 14)
+    #ax.set_ylim(-50, max(y1)+1000)
+    ax.set_xlim(-20, 1500)
+    #ax.set_ylim(-50, 1500)
+    ax.set_ylim(-50, 2000)
+    #ax.legend(fontsize = 14)
+
+
+    ax.set_xticks(np.arange(0, 1500, 60))
+
+
+    ax.set_xticklabels(Time_01, fontsize = 8)
+
+
+    ax.grid(which='major',
+        color = 'k')
+    ax.minorticks_on()
+    ax.grid(which='minor',
+        color = 'gray',
+        linestyle = ':')
+# шаг вспомогательной сетки в зависимости от выбранного шага
+    ax.xaxis.set_minor_locator(MultipleLocator(t_step_min))
+    #ax.legend()
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+def poisson_all(N,I):
+    p_expected_list = []
+    Data_consumer = pd.read_excel(r'C:\\Users\\nsavvin\Desktop\\programm2\\Count result.xlsx')
+    Data_list_interval = pd.read_excel(r'C:\\Users\\nsavvin\Desktop\\programm2\\random_list_interval.xlsx')
+    index_time_normal = Data_list_interval['index_time_normal']
+    format_time = Data_list_interval['format_time']
+    p_list = Data_list_interval['p_list']
+    index_on_list = Data_consumer['index_on']
+    index_off_list = Data_consumer['index_off']
+    count_consumer_list = Data_consumer['Count']
+    poisson_list_all =[]
+    poisson_list =[]
+    p_expected_poisson_list_all = []
+    for i in range(len(count_consumer_list)):
+        index_on = index_on_list[i]*N
+        index_off = index_off_list[i]*N
+        count_consumer_medium = count_consumer_list[i]
+        count_index = index_off - index_on
+        s = np.random.poisson(count_consumer_medium, count_index).tolist()
+        poisson_list.extend(s)
+    for q in range(len(poisson_list_all)):
+        p_expected = (p_list[q])*(poisson_list[q])
+        poisson_list_all.append(p_expected)
+    p_expected_poisson_list_all.append(p_expected_list)
+    return index_time_normal, poisson_list_all

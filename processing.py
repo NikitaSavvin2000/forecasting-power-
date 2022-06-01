@@ -1,3 +1,4 @@
+from audioop import avg
 from functools import reduce
 import random
 from tkinter import W
@@ -9,12 +10,11 @@ import math
 import random
 import itertools
 import numpy as np
-from numpy import append, array
+from numpy import append, array, mean
 import operator
+import  openpyxl as ox
 
-def oneDArray(x):
-    return list(itertools.chain(*x))
-
+wb=ox.Workbook()
 
 def processed_data (d,Data_count, t_step_min, count_values):
     a = int(((24*60)/t_step_min) + 1)
@@ -57,41 +57,6 @@ def processed_data (d,Data_count, t_step_min, count_values):
     Data = pd.read_excel(r'C:\\Users\\nsavvin\\Desktop\\programm\\Result.xlsx' )
     return Data
 
-def test(Data_count, t_step_min, N):
-
-    B = []
-
-    t_count_turn_on = np.array(Data_count['t_turn_on'])
-    t_count_turn_off = np.array(Data_count['t_turn_off'])
-
-    count = np.array(Data_count['Count'])
-    on_list =[]
-    off_list = []
-    for i in range(len(count)):
-        min_on_count = parse_hour_in_min(t_count_turn_on[i])
-        min_off_count = parse_hour_in_min(t_count_turn_off[i])
-        on = math.ceil((min_on_count)/t_step_min)
-        off = math.ceil((min_off_count)/t_step_min)
-        if off == 0 and on > 0:
-            off = int(((24*60)/t_step_min))
-        
-        on_list.append(on)
-        off_list.append(off)
-        
-            # записывает данные при стандартном включении выключении, когда min_on < min_of
-    r = {
-        'time_on' : [q for q in Data_count['t_turn_on']],
-        'teme_off' : [w for w in Data_count['t_turn_off']],
-        'index_on' : [x for x in on_list],
-        'index_off' : [y for y in off_list],
-        'Count' : [count for count in Data_count['Count']]
-    }
-    
-    result = pd.DataFrame(data = r)
-    result.to_excel(r'C:\\Users\\nsavvin\Desktop\\programm2\\Count result.xlsx')
-    Data_consumer = pd.read_excel(r'C:\\Users\\nsavvin\Desktop\\programm2\\Count result.xlsx') 
-    
-    return B
 
 def random_list_interval(N, Data):
     # 6 - количество секунд в условной еденице времени нужно будет автоматически рассчитать
@@ -125,12 +90,7 @@ def random_list_interval(N, Data):
 
 
 def poisson_all(N):
-    p_expected_list = []
     Data_consumer = pd.read_excel(r'C:\\Users\\nsavvin\Desktop\\programm2\\Count result.xlsx')
-    Data_list_interval = pd.read_excel(r'C:\\Users\\nsavvin\Desktop\\programm2\\random_list_interval.xlsx')
-    index_time_normal = Data_list_interval['index_time_normal']
-    format_time = Data_list_interval['format_time']
-    p_list = Data_list_interval['p_list']
     index_on_list = Data_consumer['index_on']
     index_off_list = Data_consumer['index_off']
     count_consumer_list = Data_consumer['Count']
@@ -142,43 +102,71 @@ def poisson_all(N):
         count_index = index_off - index_on
         s = np.random.poisson(count_consumer_medium, count_index).tolist()
         poisson_list.extend(s)
-    for q in range(len(poisson_list)):
-        p_expected = (p_list[q])*(poisson_list[q])
-        p_expected_list.append(p_expected)
-    r = {
-        'format_time': [t for t in format_time],
-        'Time': [q for q in index_time_normal],
-        'P_medium' : [e for e in p_list],
-        'Count_consumer_random' : [w for w in poisson_list],
-        'P_random' : [r for r in p_expected_list]
-    }   
-    result = pd.DataFrame(data = r)
-    result.to_excel(r'C:\\Users\\nsavvin\Desktop\\programm2\\Poisson P.xlsx')
-
-    
-
-def medium_cout_on_for_interval(): #Среднее количство включений по интервалам времени 
-    pass
+    return poisson_list
 
 
+def iteration(N, I):
+    iteration_list_poisson = []
+    Data_list_interval = pd.read_excel(r'C:\\Users\\nsavvin\Desktop\\programm2\\random_list_interval.xlsx')
+    index_time_normal = Data_list_interval['index_time_normal']
+    format_time = Data_list_interval['format_time']
+    p_list = Data_list_interval['p_list']
+    i = 0
+    poisson_list_p_itteration = []
+    while i <= I:
+        i+=1
+        iteration_poisson = poisson_all(N)
+        iteration_list_poisson.append(iteration_poisson)
+    for i in range(I):
+        poisson_list_p = []
+        for x in range(len(p_list)):
+            p = (iteration_list_poisson[i][x]*p_list[x])
+            poisson_list_p.append(p)
+        poisson_list_p_itteration.append(poisson_list_p)
+    df = pd.DataFrame(poisson_list_p_itteration)
+    dft = df.T
+    dft.to_excel(r'C:\\Users\\nsavvin\Desktop\\programm2\\random_list_interval_poisson.xlsx')
+    return format_time, index_time_normal, poisson_list_p_itteration
 
-def min_and_max_poisson(Q, Data):
+
+
+
+def min_max_medium_poisson(iteration_list_poisson):
     Data_min = []
     Data_max = []
-    R = list(map(list, zip(*Q))) # транспонирование списка списков
+    Data_medium = []
+    R = list(map(list, zip(*iteration_list_poisson))) # транспонирование списка списков
     for i in range(len(R)):
         P_min = min(R[i])
         P_max = max(R[i])
+        P_medium = mean(R[i])
         Data_min.append(P_min)
         Data_max.append(P_max)
-    r = {
-        'Time' : [time for time in Data['Time']],
-        'Min count consumer' : [(Data_min[i]/Data['P'][i])*1000 for i in range(len(Data['P']))],
-        'P_min_poisson_kW' : [min for min in Data_min],
-        'Max count consumer' : [(Data_max[i]/Data['P'][i])*1000 for i in range(len(Data['P']))],
-        'P_max_poisson_kW' : [max for max in Data_max]
-    }
-    result = pd.DataFrame(data = r)
-    result.to_excel(r'C:\\Users\\nsavvin\Desktop\\programm2\\Intermediate_data\\max_min_poisson.xlsx')
+        Data_medium.append(P_medium)
+    return Data_min, Data_max, Data_medium
+
+def write_out_data(
+    format_time,
+    index_time_normal,
+    poisson_list_p_itteration, 
+    min_poisson_destribution, 
+    max_poisson_destribution, 
+    medium_poisson_destribution,
+    ):
+    name_column_list = []
     
-    return Data_min, Data_max
+    for i in range(len(poisson_list_p_itteration)):
+        name_column = 'P_poissin_' + str(i+1)
+        name_column_list.append(name_column)
+    name_column_dict = dict(zip(name_column_list, poisson_list_p_itteration))
+    any_result = {
+        'Index_time' : index_time_normal,
+        'Time' : format_time,
+        'Min_poisson': min_poisson_destribution,
+        'Max_poisson': max_poisson_destribution,
+        'Medium_poisson': medium_poisson_destribution,
+    }
+    any_result.update(name_column_dict)
+    result = pd.DataFrame(any_result)
+    result.to_excel(r'C:\\Users\\nsavvin\Desktop\\programm2\\test_result.xlsx')
+    
