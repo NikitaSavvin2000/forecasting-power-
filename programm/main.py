@@ -16,7 +16,7 @@ try:
 except TypeError:
     print('Введите корректно минуты без дробных чисел и букв')
 
-Data_count = pd.read_excel('C:\\Users\\nsavvin\\Desktop\\programm2\\any_data\\count.xlsx')
+Data_count = pd.read_excel('C:\\Users\\nsavvin\\Desktop\\programm2\\Data\\any_data\\count.xlsx')
 d = reading_start_data(path_to_files)
 
 count_files = count_consumer(path_to_files)

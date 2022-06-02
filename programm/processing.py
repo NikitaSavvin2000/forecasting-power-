@@ -1,22 +1,14 @@
-from audioop import avg
-from functools import reduce
 import random
-from tkinter import W
 import pandas as pd
 import numpy as np
 import math
 from parse import parse_hour_in_min, parse_min_in_hour
 import math
 import random
-import itertools
 import numpy as np
-from numpy import append, array, mean
-import operator
-import  openpyxl as ox
+from numpy import mean
 
-wb=ox.Workbook()
-
-def processed_data (d,Data_count, t_step_min, count_values):
+def processed_data (d, t_step_min, count_values):
     a = int(((24*60)/t_step_min) + 1)
     A = [0.0]*a
     t_turn_on = np.array(d['t_turn_on'])
@@ -53,24 +45,63 @@ def processed_data (d,Data_count, t_step_min, count_values):
         'Time' : [parse_min_in_hour(x*t_step_min) for x in range(len(A))],
     }
     result = pd.DataFrame(data = r)
-    result.to_excel(r'C:\\Users\\nsavvin\Desktop\\programm\\Result.xlsx')
-    Data = pd.read_excel(r'C:\\Users\\nsavvin\\Desktop\\programm\\Result.xlsx' )
+    result.to_excel(r'C:\\Users\\nsavvin\Desktop\\programm2\\Intermediate_data\\Result.xlsx')
+    Data = result
     return Data
 
 
-def random_list_interval(N, Data):
+def write_count_consumer(Data_count, t_step_min):
+
+    B = []
+
+    t_count_turn_on = np.array(Data_count['t_turn_on'])
+    t_count_turn_off = np.array(Data_count['t_turn_off'])
+
+    count = np.array(Data_count['Count'])
+    on_list =[]
+    off_list = []
+    for i in range(len(count)):
+        min_on_count = parse_hour_in_min(t_count_turn_on[i])
+        min_off_count = parse_hour_in_min(t_count_turn_off[i])
+        on = math.ceil((min_on_count)/t_step_min)
+        off = math.ceil((min_off_count)/t_step_min)
+        if off == 0 and on > 0:
+            off = int(((24*60)/t_step_min))
+
+        on_list.append(on)
+        off_list.append(off)
+
+            # записывает данные при стандартном включении выключении, когда min_on < min_of
+    r = {
+        'time_on' : [q for q in Data_count['t_turn_on']],
+        'teme_off' : [w for w in Data_count['t_turn_off']],
+        'index_on' : [x for x in on_list],
+        'index_off' : [y for y in off_list],
+        'Count' : [count for count in Data_count['Count']]
+    }
+
+    result_count_consumer = pd.DataFrame(data = r)
+    result_count_consumer.to_excel(r'C:\\Users\\nsavvin\Desktop\\programm2\\Intermediate_data\\Count result.xlsx')
+    return result_count_consumer
+
+
+
+def random_list_interval(N, Data, t_step_min):
     # 6 - количество секунд в условной еденице времени нужно будет автоматически рассчитать
     index_time = []
     format_time = []
     p_list = []
+    sec_in_tick = int((t_step_min*60)/100)
     for r in range(len(Data['Time'])-1):
         start = r * 100
         end = (r+1) * 100
         x = random.sample(range(start, end-1), N)
         x.sort()
         x.append(end)
+        if r == 0:
+            x[0] =0
         index_time.append(x)
-        count_sec = [i*6 for i in x]# 6 - количество секунд в условной еденице времени нужно будет автоматически рассчитать
+        count_sec = [i*sec_in_tick for i in x]# 6 - количество секунд в условной еденице времени нужно будет автоматически рассчитать
         p = Data['P'][r]
         for i in range(len(count_sec)): 
             hour = math.floor(count_sec[i]/3600)
@@ -86,11 +117,11 @@ def random_list_interval(N, Data):
         'p_list' : [e for e in p_list]
     }
     result = pd.DataFrame(data = r)
-    result.to_excel(r'C:\\Users\\nsavvin\Desktop\\programm2\\random_list_interval.xlsx')
+    result.to_excel(r'C:\\Users\\nsavvin\Desktop\\programm2\\Intermediate_data\\random_list_interval.xlsx')
 
 
 def poisson_all(N):
-    Data_consumer = pd.read_excel(r'C:\\Users\\nsavvin\Desktop\\programm2\\Count result.xlsx')
+    Data_consumer = pd.read_excel(r'C:\\Users\\nsavvin\Desktop\\programm2\\Intermediate_data\\Count result.xlsx')
     index_on_list = Data_consumer['index_on']
     index_off_list = Data_consumer['index_off']
     count_consumer_list = Data_consumer['Count']
@@ -107,7 +138,7 @@ def poisson_all(N):
 
 def iteration(N, I):
     iteration_list_poisson = []
-    Data_list_interval = pd.read_excel(r'C:\\Users\\nsavvin\Desktop\\programm2\\random_list_interval.xlsx')
+    Data_list_interval = pd.read_excel(r'C:\\Users\\nsavvin\Desktop\\programm2\\Intermediate_data\\random_list_interval.xlsx')
     index_time_normal = Data_list_interval['index_time_normal']
     format_time = Data_list_interval['format_time']
     p_list = Data_list_interval['p_list']
@@ -125,7 +156,7 @@ def iteration(N, I):
         poisson_list_p_itteration.append(poisson_list_p)
     df = pd.DataFrame(poisson_list_p_itteration)
     dft = df.T
-    dft.to_excel(r'C:\\Users\\nsavvin\Desktop\\programm2\\random_list_interval_poisson.xlsx')
+    dft.to_excel(r'C:\\Users\\nsavvin\Desktop\\programm2\\Intermediate_data\\random_list_interval_poisson.xlsx')
     return format_time, index_time_normal, poisson_list_p_itteration
 
 
