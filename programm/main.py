@@ -1,9 +1,13 @@
-import itertools
 import pandas as pd
-from processing import processed_data, min_max_medium_poisson, poisson_all,random_list_interval, iteration, write_out_data, write_count_consumer
+from processing import (
+    processed_data, 
+    min_max_medium_poisson, 
+    poisson_all,random_list_interval, 
+    iteration, write_out_data, 
+    write_count_consumer
+    )
 from reading import reading_start_data, count_consumer
 from graphic import graf_gistogram_medium, graf_gistogram_poison, graf_gistogram_min_max_medium_poison
-import numpy as np
 import matplotlib.pyplot as plt
 
 path_to_files = 'C:\\Users\\nsavvin\\Desktop\\programm2'
@@ -23,24 +27,28 @@ count_files = count_consumer(path_to_files)
 
 D = processed_data(d, t_step_min, count_files)
 
-#Q = data_poisson(D, medium_values, count_values)
 
 u = write_count_consumer(Data_count, t_step_min)
 
-
-#Data_min, Data_max = min_and_max_poisson(Q, D)
-#graf_gistogram_min_max_poison(D, Data_min, Data_max, t_step_min)
-
 random_list_interval(count_values-1, D, t_step_min)
-#plt.show()
 
 N = count_values
-#time_index_interval, all_poisson_destribution = poisson_all(N, I)
+
 poisson_list = poisson_all(N)
+
 t, x, y = iteration(N, I)
+
 min_poisson_destribution, max_poisson_destribution, medium_poisson_destribution = min_max_medium_poisson(y)
+
 graf_gistogram_poison(D, t_step_min, y, x)
-graf_gistogram_min_max_medium_poison(D, min_poisson_destribution, max_poisson_destribution, medium_poisson_destribution, x, t_step_min)
+
+graf_gistogram_min_max_medium_poison(
+    D, min_poisson_destribution, 
+    max_poisson_destribution, 
+    medium_poisson_destribution, 
+    x, t_step_min
+)
+
 graf_gistogram_medium(D, t_step_min, count_files)
 
 write_out_data(

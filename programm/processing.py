@@ -53,10 +53,8 @@ def processed_data (d, t_step_min, count_values):
 def write_count_consumer(Data_count, t_step_min):
 
     B = []
-
     t_count_turn_on = np.array(Data_count['t_turn_on'])
     t_count_turn_off = np.array(Data_count['t_turn_off'])
-
     count = np.array(Data_count['Count'])
     on_list =[]
     off_list = []
@@ -67,10 +65,8 @@ def write_count_consumer(Data_count, t_step_min):
         off = math.ceil((min_off_count)/t_step_min)
         if off == 0 and on > 0:
             off = int(((24*60)/t_step_min))
-
         on_list.append(on)
         off_list.append(off)
-
             # записывает данные при стандартном включении выключении, когда min_on < min_of
     r = {
         'time_on' : [q for q in Data_count['t_turn_on']],
@@ -79,11 +75,9 @@ def write_count_consumer(Data_count, t_step_min):
         'index_off' : [y for y in off_list],
         'Count' : [count for count in Data_count['Count']]
     }
-
     result_count_consumer = pd.DataFrame(data = r)
     result_count_consumer.to_excel(r'C:\\Users\\nsavvin\Desktop\\programm2\\Intermediate_data\\Count result.xlsx')
     return result_count_consumer
-
 
 
 def random_list_interval(N, Data, t_step_min):
@@ -160,8 +154,6 @@ def iteration(N, I):
     return format_time, index_time_normal, poisson_list_p_itteration
 
 
-
-
 def min_max_medium_poisson(iteration_list_poisson):
     Data_min = []
     Data_max = []
@@ -201,4 +193,3 @@ def write_out_data(
     result = pd.DataFrame(any_result)
     result.to_excel(r'C:\\Users\\nsavvin\Desktop\\programm2\\test_result.xlsx')
     return any_result
-    
