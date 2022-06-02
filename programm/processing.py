@@ -200,4 +200,5 @@ def write_out_data(
     any_result.update(name_column_dict)
     result = pd.DataFrame(any_result)
     result.to_excel(r'C:\\Users\\nsavvin\Desktop\\programm2\\test_result.xlsx')
+    return any_result
     
