@@ -1,0 +1,11 @@
+from pathlib import Path  
+path_Count_result = Path('Intermediate_data', 'Count result.xlsx')
+path_intermediate_result = Path('intermediate_data', 'intermediate_result.xlsx')
+path_intermediate_result1 = Path('Intermediate_data', 'intermediate_result1.csv')
+path_max_min_poisson = Path('Intermediate_data', 'max_min_poisson.xlsx')
+path_random_list_interval_poisson = Path('Intermediate_data', 'random_list_interval_poisson.xlsx')
+path_random_list_interval = Path('Intermediate_data', 'random_list_interval.xlsx')
+path_Result = Path('Intermediate_data', 'Result.xlsx')
+path_test_result = Path('test_result.xlsx')
+path_any_data = Path('Data', 'any_data', 'count.xlsx')
+path_consumer = Path('Data', 'consumer')

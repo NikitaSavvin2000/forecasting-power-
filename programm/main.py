@@ -7,10 +7,12 @@ from processing import (
     write_count_consumer
     )
 from reading import reading_start_data, count_consumer
-from graphic import graf_gistogram_medium, graf_gistogram_poison, graf_gistogram_min_max_medium_poison
+from graphic import (
+    graf_gistogram_medium,
+    graf_gistogram_min_max_medium_poison
+)
 import matplotlib.pyplot as plt
-
-path_to_files = 'C:\\Users\\nsavvin\\Desktop\\programm2'
+from path import *
 
 
 try:
@@ -20,13 +22,11 @@ try:
 except TypeError:
     print('Введите корректно минуты без дробных чисел и букв')
 
-Data_count = pd.read_excel('C:\\Users\\nsavvin\\Desktop\\programm2\\Data\\any_data\\count.xlsx')
-d = reading_start_data(path_to_files)
+Data_count = pd.read_excel(path_any_data)
 
-count_files = count_consumer(path_to_files)
+d, count_files = reading_start_data(path_consumer)
 
 D = processed_data(d, t_step_min, count_files)
-
 
 u = write_count_consumer(Data_count, t_step_min)
 
@@ -38,9 +38,12 @@ poisson_list = poisson_all(N)
 
 t, x, y = iteration(N, I)
 
-min_poisson_destribution, max_poisson_destribution, medium_poisson_destribution = min_max_medium_poisson(y)
+(
+    min_poisson_destribution,
+    max_poisson_destribution,
+    medium_poisson_destribution
+)= min_max_medium_poisson(y)
 
-graf_gistogram_poison(D, t_step_min, y, x)
 
 graf_gistogram_min_max_medium_poison(
     D, min_poisson_destribution, 
@@ -56,6 +59,6 @@ write_out_data(
     min_poisson_destribution, 
     max_poisson_destribution, 
     medium_poisson_destribution
-    )
+)
 
 plt.show()

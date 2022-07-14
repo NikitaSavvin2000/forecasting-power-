@@ -4,9 +4,9 @@ import numpy as np
 import math
 from parse import parse_hour_in_min, parse_min_in_hour
 import math
-import random
 import numpy as np
 from numpy import mean
+from path import *
 
 def processed_data (d, t_step_min, count_values):
     a = int(((24*60)/t_step_min) + 1)
@@ -22,7 +22,7 @@ def processed_data (d, t_step_min, count_values):
         min_of = parse_hour_in_min(t_turn_of[i])
         # определяет в какую ячейку списка вписывать начало включения
         number_in_list = math.trunc(min_on/t_step_min)
-        # "Y" - число обозначающее сколько промежутков времени задевает включение
+        # 'Y' - число обозначающее сколько промежутков времени задевает включение
         # если интервал равен 30 мин а время включения 13:30 выключения 14:35
         # то задевает 3 промежутка времени по 30 минут
         Y = math.ceil((min_of -min_on)/t_step_min)
@@ -45,14 +45,12 @@ def processed_data (d, t_step_min, count_values):
         'Time' : [parse_min_in_hour(x*t_step_min) for x in range(len(A))],
     }
     result = pd.DataFrame(data = r)
-    result.to_excel(r'C:\\Users\\nsavvin\Desktop\\programm2\\Intermediate_data\\Result.xlsx')
+    result.to_excel(path_Result)
     Data = result
     return Data
 
 
 def write_count_consumer(Data_count, t_step_min):
-
-    B = []
     t_count_turn_on = np.array(Data_count['t_turn_on'])
     t_count_turn_off = np.array(Data_count['t_turn_off'])
     count = np.array(Data_count['Count'])
@@ -76,7 +74,7 @@ def write_count_consumer(Data_count, t_step_min):
         'Count' : [count for count in Data_count['Count']]
     }
     result_count_consumer = pd.DataFrame(data = r)
-    result_count_consumer.to_excel(r'C:\\Users\\nsavvin\Desktop\\programm2\\Intermediate_data\\Count result.xlsx')
+    result_count_consumer.to_excel(path_Count_result)
     return result_count_consumer
 
 
@@ -111,11 +109,11 @@ def random_list_interval(N, Data, t_step_min):
         'p_list' : [e for e in p_list]
     }
     result = pd.DataFrame(data = r)
-    result.to_excel(r'C:\\Users\\nsavvin\Desktop\\programm2\\Intermediate_data\\random_list_interval.xlsx')
+    result.to_excel(path_random_list_interval)
 
 
 def poisson_all(N):
-    Data_consumer = pd.read_excel(r'C:\\Users\\nsavvin\Desktop\\programm2\\Intermediate_data\\Count result.xlsx')
+    Data_consumer = pd.read_excel(path_Count_result)
     index_on_list = Data_consumer['index_on']
     index_off_list = Data_consumer['index_off']
     count_consumer_list = Data_consumer['Count']
@@ -132,7 +130,7 @@ def poisson_all(N):
 
 def iteration(N, I):
     iteration_list_poisson = []
-    Data_list_interval = pd.read_excel(r'C:\\Users\\nsavvin\Desktop\\programm2\\Intermediate_data\\random_list_interval.xlsx')
+    Data_list_interval = pd.read_excel(path_random_list_interval)
     index_time_normal = Data_list_interval['index_time_normal']
     format_time = Data_list_interval['format_time']
     p_list = Data_list_interval['p_list']
@@ -150,7 +148,7 @@ def iteration(N, I):
         poisson_list_p_itteration.append(poisson_list_p)
     df = pd.DataFrame(poisson_list_p_itteration)
     dft = df.T
-    dft.to_excel(r'C:\\Users\\nsavvin\Desktop\\programm2\\Intermediate_data\\random_list_interval_poisson.xlsx')
+    dft.to_excel(path_random_list_interval_poisson)
     return format_time, index_time_normal, poisson_list_p_itteration
 
 
@@ -191,5 +189,5 @@ def write_out_data(
     }
     any_result.update(name_column_dict)
     result = pd.DataFrame(any_result)
-    result.to_excel(r'C:\\Users\\nsavvin\Desktop\\programm2\\test_result.xlsx')
+    result.to_excel(path_test_result)
     return any_result
