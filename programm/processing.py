@@ -84,14 +84,14 @@ def random_list_interval(N, Data, t_step_min):
     format_time = []
     p_list = []
     sec_in_tick = int((t_step_min*60)/100)
-    for r in range(len(Data['Time'])-1):
+    for r in range(len(Data['Time'])-1): # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         start = r * 100
         end = (r+1) * 100
-        x = random.sample(range(start, end-1), N)
+        x = random.sample(range(start, end), N)
         x.sort()
         x.append(end)
         if r == 0:
-            x[0] =0
+            x[0] = 0
         index_time.append(x)
         count_sec = [i*sec_in_tick for i in x]# 6 - количество секунд в условной еденице времени нужно будет автоматически рассчитать
         p = Data['P'][r]
